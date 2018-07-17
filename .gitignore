@@ -1,0 +1,14 @@
+*.idea
+eagle.py
+*.iml
+*target
+*.DS_Store
+/log
+*.log
+*/monitor
+monitor
+output
+# front-end ignore files
+.vscode
+node_modules
+walls/*
