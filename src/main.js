@@ -20,7 +20,7 @@ const constants = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
     },
-    resolution: '1280/800'
+    resolution: '1920/1080'
 }
 
 function getOnePageItems(cat) {
