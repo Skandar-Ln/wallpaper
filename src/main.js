@@ -7,9 +7,10 @@ const constants = {
         'anime': 'anime',
     },
     counts: {
-        'game': 7,
-        'anime': 7,
+        'game': 15,
+        'anime': 15,
     },
+    output: 'walls/',
     listReg: 'class="pr"(?:.|\n)+?href="(.+?)"',
     detailReg: 'class="thumbnail(?:.|\n)+?src="(.+?)"',
     prefix: 'https://kabekin.com',
@@ -53,8 +54,15 @@ function getDetails(items) {
 
     return new Promise((resolve, reject) => {
         const result = [];
+        let errNum = 0;
+
         for (let item of items) {
             request(item.url, (e, r, b) => {
+                if (e) {
+                    errNum++;
+                    return;
+                }
+
                 const reg = new RegExp(detailReg, 'ig');
                 const res = reg.exec(b);
 
@@ -65,7 +73,7 @@ function getDetails(items) {
                     });
                 }
 
-                if (result.length === items.length) {
+                if (result.length === items.length - errNum) {
                     resolve(result);
                 }
             });
@@ -76,7 +84,7 @@ function getDetails(items) {
 function dowloadItem(item) {
     console.log('download: ' + item.url);
     return new Promise((resolve, reject) => {
-        let stream = fs.createWriteStream('walls/' + item.name);
+        let stream = fs.createWriteStream(constants.output + item.name);
         request(item.url).pipe(stream).on('close', () => {
             console.log(item.name + ' completed!');
             resolve();
