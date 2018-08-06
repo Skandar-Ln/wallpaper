@@ -27,30 +27,6 @@ const constants = {
     resolution: '1920/1080'
 }
 
-// function getOnePageItems(cat) {
-//     const {prefix, catMap, listReg, counts, resolution} = constants;
-
-//     const url = `${prefix}/category/${catMap[cat]}`; // 此处会自定义
-
-//     return new Promise((resolve, reject) => {
-//         request(url, (e, r, b) => {
-//             const reg = new RegExp(listReg, 'ig');
-//             const result = [];
-
-//             for (let i = 0; i < counts[cat]; i++) {
-//                 const res = reg.exec(b);
-//                 if(res) {
-//                     result.push({
-//                         url: `${res[1]}/${resolution}`,
-//                         name: `${cat}_${i + 1}.jpg`
-//                     });
-//                 }
-//             }
-
-//             resolve(result);
-//         });
-//     });
-// }
 function getOnePageItems(page) {
     const {prefix1, listReg, counts1, resolution} = constants;
     const url = `${prefix1}${page}`; // 此处会自定义
@@ -112,19 +88,7 @@ function dowloadItem(item) {
     });
 }
 
-// async function main() {
-//     for (let cat in constants.counts) {
-//         console.log(cat + '................: ' + constants.counts[cat]);
 
-//         await getOnePageItems(cat).then(async items => {
-//             return getDetails(items);
-//         }).then(details => {
-//             for (let detail of details) {
-//                 dowloadItem(detail);
-//             }
-//         });
-//     }
-// }
 async function main() {
     const {pageNum, pageRange} =  constants;
     for (let i=0; i < pageNum; i++ ) {
