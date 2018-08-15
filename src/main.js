@@ -7,13 +7,16 @@ const constants = {
         'anime': 'anime',
     },
     counts: {
-        'game': 15,
-        'anime': 15,
+        'game': 7,
+        'anime': 7,
     },
-    output: 'walls/',
+    pageRange: 210,
+    pageNum: 3,
+    counts1: 24,
     listReg: 'class="pr"(?:.|\n)+?href="(.+?)"',
     detailReg: 'class="thumbnail(?:.|\n)+?src="(.+?)"',
     prefix: 'https://kabekin.com',
+    prefix1: 'https://kabekin.com/resolution/1920/1080',
     headers: {
         'Connection': 'keep-alive',
         'Cache-Control': 'max-age=0',
@@ -24,26 +27,26 @@ const constants = {
     resolution: '1920/1080'
 }
 
-function getOnePageItems(cat) {
-    const {prefix, catMap, listReg, counts, resolution} = constants;
-
-    const url = `${prefix}/category/${catMap[cat]}`; // 此处会自定义
-
+function getOnePageItems(page) {
+    const {prefix1, listReg, counts1, resolution} = constants;
+    const url = `${prefix1}${page}`; // 此处会自定义
+    console.log(`url${url}`)
     return new Promise((resolve, reject) => {
+  
         request(url, (e, r, b) => {
             const reg = new RegExp(listReg, 'ig');
             const result = [];
-
-            for (let i = 0; i < counts[cat]; i++) {
+            for (let i = 0; i < counts1; i++) {
                 const res = reg.exec(b);
+                console.log(`匹配${i}${res[1]}`)
+                const pageName = page.replace(/\?/g,'');
                 if(res) {
                     result.push({
                         url: `${res[1]}/${resolution}`,
-                        name: `${cat}_${i + 1}.jpg`
+                        name: `${pageName}_${i + 1}.jpg`
                     });
                 }
             }
-
             resolve(result);
         });
     });
@@ -54,15 +57,8 @@ function getDetails(items) {
 
     return new Promise((resolve, reject) => {
         const result = [];
-        let errNum = 0;
-
         for (let item of items) {
             request(item.url, (e, r, b) => {
-                if (e) {
-                    errNum++;
-                    return;
-                }
-
                 const reg = new RegExp(detailReg, 'ig');
                 const res = reg.exec(b);
 
@@ -73,7 +69,7 @@ function getDetails(items) {
                     });
                 }
 
-                if (result.length === items.length - errNum) {
+                if (result.length === items.length) {
                     resolve(result);
                 }
             });
@@ -84,7 +80,7 @@ function getDetails(items) {
 function dowloadItem(item) {
     console.log('download: ' + item.url);
     return new Promise((resolve, reject) => {
-        let stream = fs.createWriteStream(constants.output + item.name);
+        let stream = fs.createWriteStream('walls/' + item.name);
         request(item.url).pipe(stream).on('close', () => {
             console.log(item.name + ' completed!');
             resolve();
@@ -92,11 +88,15 @@ function dowloadItem(item) {
     });
 }
 
-async function main() {
-    for (let cat in constants.counts) {
-        console.log(cat + '................: ' + constants.counts[cat]);
 
-        await getOnePageItems(cat).then(async items => {
+async function main() {
+    const {pageNum, pageRange} =  constants;
+    for (let i=0; i < pageNum; i++ ) {
+        let num = parseInt(pageRange*Math.random());
+        let page = num ? `?page=${num}` : '';
+        console.log(`..................page${num}`);
+
+        await getOnePageItems(page).then(async items => {
             return getDetails(items);
         }).then(details => {
             for (let detail of details) {
