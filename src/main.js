@@ -38,9 +38,9 @@ function getOnePageItems(page) {
             const result = [];
             for (let i = 0; i < counts1; i++) {
                 const res = reg.exec(b);
-                console.log(`匹配${i}${res[1]}`)
                 const pageName = page.replace(/\?/g,'');
                 if(res) {
+                    console.log(`匹配${i}${res[1]}`)
                     result.push({
                         url: `${res[1]}/${resolution}`,
                         name: `${pageName}_${i + 1}.jpg`
@@ -55,25 +55,27 @@ function getOnePageItems(page) {
 function getDetails(items) {
     const {detailReg, prefix} = constants;
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         const result = [];
+        const promiseArr = [];
         for (let item of items) {
-            request(item.url, (e, r, b) => {
-                const reg = new RegExp(detailReg, 'ig');
-                const res = reg.exec(b);
-
-                if(res) {
-                    result.push({
-                        url: `${prefix}${res[1]}`,
-                        name: item.name
-                    });
-                }
-
-                if (result.length === items.length) {
-                    resolve(result);
-                }
+            let promise = new Promise((resolve, reject) => {
+                request(item.url, (e, r, b) => {
+                    const reg = new RegExp(detailReg, 'ig');
+                    const res = reg.exec(b);
+                    if(res) {
+                        console.log('getDetail',res[1])
+                        result.push({
+                            url: `${prefix}${res[1]}`,
+                            name: item.name
+                        });
+                    }
+                    resolve();
+                });
             });
+            promiseArr.push(promise);
         }
+        Promise.all(promiseArr).then(() => resolve(result));
     });
 }
 
@@ -89,20 +91,22 @@ function dowloadItem(item) {
 }
 
 
-async function main() {
+ function main() {
     const {pageNum, pageRange} =  constants;
+    let promise = Promise.resolve();
     for (let i=0; i < pageNum; i++ ) {
         let num = parseInt(pageRange*Math.random());
         let page = num ? `?page=${num}` : '';
         console.log(`..................page${num}`);
 
-        await getOnePageItems(page).then(async items => {
+        promise = promise.then(() => getOnePageItems(page)).then(  items => {
             return getDetails(items);
         }).then(details => {
             for (let detail of details) {
                 dowloadItem(detail);
             }
         });
+
     }
 }
 

@@ -1,5 +1,5 @@
 # wallpaper
-
+(首先在根目录下创建名为walls的文件夹)
 ## 使用说明
 
 1. npm i
