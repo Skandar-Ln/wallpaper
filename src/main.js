@@ -39,8 +39,6 @@ function getOnePageItems(page) {
             for (let i = 0; i < counts1; i++) {
                 const res = reg.exec(b);
                 const pageName = page.replace(/\?/g,'');
-                console.log(`匹配${i}${res[1]}`)
-                const pageName = page.replace(/\?/g,'');
                 if(res) {
                     console.log(`匹配${i}${res[1]}`)
                     result.push({
@@ -74,20 +72,6 @@ function getDetails(items) {
                     }
                     resolve();
                 });
-            request(item.url, (e, r, b) => {
-                const reg = new RegExp(detailReg, 'ig');
-                const res = reg.exec(b);
-
-                if(res) {
-                    result.push({
-                        url: `${prefix}${res[1]}`,
-                        name: item.name
-                    });
-                }
-
-                if (result.length === items.length) {
-                    resolve(result);
-                }
             });
             promiseArr.push(promise);
         }
@@ -107,13 +91,6 @@ function dowloadItem(item) {
 }
 
 
-async function main() {
-    const {pageNum, pageRange} =  constants;
-    for (let i=0; i < pageNum; i++ ) {
-        let num = parseInt(pageRange*Math.random());
-        let page = num ? `?page=${num}` : '';
-        console.log(`..................page${num}`);
-
  function main() {
     const {pageNum, pageRange} =  constants;
     let promise = Promise.resolve();
@@ -123,7 +100,6 @@ async function main() {
         console.log(`..................page${num}`);
 
         promise = promise.then(() => getOnePageItems(page)).then(  items => {
-        await getOnePageItems(page).then(async items => {
             return getDetails(items);
         }).then(details => {
             for (let detail of details) {
