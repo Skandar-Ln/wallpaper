@@ -11,6 +11,4 @@ output
 # front-end ignore files
 .vscode
 node_modules
-/*
-walls/*.jpg
 
